@@ -1,16 +1,23 @@
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { UserRecord } from "firebase-admin/auth";
-import { onUserCreation } from "firebase-functions/v2/identity";
-import { User } from "@metiscore/types";
+import { onCall, HttpsError } from "firebase-functions/v2/https";
+import { UserRecord as AuthUser } from "firebase-admin/auth";
+import { User as DbUser } from "@metiscore/types";
 
 initializeApp();
 
-export const createuserdocument = onUserCreation(async (event: { data: UserRecord }): Promise<void> => {
-  const user = event.data;
+export const onboardnewuser = onCall(async (request) => {
+  // 1. Check that the user calling this function is authenticated.
+  if (!request.auth) {
+    throw new HttpsError("unauthenticated", "You must be logged in to call this function.");
+  }
+
+  // 2. Get the user data passed from the frontend.
+  const user = request.data as AuthUser;
   const { uid, email, displayName } = user;
 
-  const newUser: User = {
+  // 3. Prepare the new user document.
+  const newUser: DbUser = {
     uid,
     email: email || null,
     displayName: displayName || null,
@@ -18,9 +25,12 @@ export const createuserdocument = onUserCreation(async (event: { data: UserRecor
   };
 
   try {
-    await getFirestore().collection("users").doc(uid).set(newUser);
-    console.log(`Successfully created user document for ${uid}`);
+    // 4. Create the document in the 'users' collection.
+    await getFirestore().collection("users").doc(uid).set(newUser, { merge: true });
+    console.log(`Successfully onboarded user ${uid}`);
+    return { status: "success", message: `User ${uid} onboarded.` };
   } catch (error) {
-    console.error(`Error creating user document for ${uid}:`, error);
+    console.error(`Error onboarding user ${uid}:`, error);
+    throw new HttpsError("internal", "An error occurred while creating the user profile.");
   }
 });
