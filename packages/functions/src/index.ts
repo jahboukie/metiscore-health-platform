@@ -1,28 +1,26 @@
-import * as functions from "firebase-functions/v1";
-import * as admin from "firebase-admin";
+import { initializeApp } from "firebase-admin/app";
+import { getFirestore } from "firebase-admin/firestore";
+import { UserRecord } from "firebase-admin/auth";
+import { onUserCreation } from "firebase-functions/v2/identity";
 import { User } from "@metiscore/types";
 
-admin.initializeApp();
-const db = admin.firestore();
+initializeApp();
 
-// V1 syntax with an explicit region specified.
-export const onUserCreate = functions
-  .region("us-central1") // You can change this to your preferred region
-  .auth.user()
-  .onCreate(async (user) => {
-    const { uid, email, displayName } = user;
+export const createuserdocument = onUserCreation(async (event: { data: UserRecord }): Promise<void> => {
+  const user = event.data;
+  const { uid, email, displayName } = user;
 
-    const newUser: User = {
-      uid,
-      email: email || null,
-      displayName: displayName || null,
-      role: "primary",
-    };
+  const newUser: User = {
+    uid,
+    email: email || null,
+    displayName: displayName || null,
+    role: "primary",
+  };
 
-    try {
-      await db.collection("users").doc(uid).set(newUser);
-      console.log(`Successfully created user document for ${uid}`);
-    } catch (error) {
-      console.error(`Error creating user document for ${uid}:`, error);
-    }
-  });
+  try {
+    await getFirestore().collection("users").doc(uid).set(newUser);
+    console.log(`Successfully created user document for ${uid}`);
+  } catch (error) {
+    console.error(`Error creating user document for ${uid}:`, error);
+  }
+});
