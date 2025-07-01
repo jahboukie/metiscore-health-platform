@@ -1,0 +1,20 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Users can only read and write their OWN user document.
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+    
+    // Journal Entries: A user can create, read, update, and delete
+    // ONLY their own journal entries.
+    // We verify this by checking if the 'userId' field on the document
+    // they are trying to access matches their own authenticated UID.
+    match /journal_entries/{entryId} {
+      allow read, update, delete: if request.auth != null && get(/databases/$(database)/documents/journal_entries/$(entryId)).data.userId == request.auth.uid;
+      allow create: if request.auth != null && request.resource.data.userId == request.auth.uid;
+    }
+  }
+}

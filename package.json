@@ -1,0 +1,15 @@
+{
+  "name": "metiscorehealth-ecosystem",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Monorepo for the MenoWellness and Partner Support applications.",
+  "author": "Jeremy Brown",
+  "scripts": {
+    "dev:meno": "pnpm --filter meno-wellness dev",
+    "dev:partner": "pnpm --filter partner-support dev"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5"
+  },
+  "packageManager": "pnpm@10.12.4"
+}
