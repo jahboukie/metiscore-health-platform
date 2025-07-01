@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
 import { onCall, HttpsError } from "firebase-functions/v2/https";
-import { UserRecord as AuthUser } from "firebase-admin/auth";
-import { User as DbUser } from "@metiscore/types";
+import { UserRecord } from "firebase-admin/auth";
+import { User } from "@metiscore/types";
 
 initializeApp();
 
@@ -13,11 +13,11 @@ export const onboardnewuser = onCall(async (request) => {
   }
 
   // 2. Get the user data passed from the frontend.
-  const user = request.data as AuthUser;
+  const user = request.data as UserRecord;
   const { uid, email, displayName } = user;
 
   // 3. Prepare the new user document.
-  const newUser: DbUser = {
+  const newUser: User = {
     uid,
     email: email || null,
     displayName: displayName || null,
