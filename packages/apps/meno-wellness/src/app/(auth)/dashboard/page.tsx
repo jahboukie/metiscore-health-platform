@@ -1,20 +1,4 @@
 import { JournalForm } from "../../components/JournalForm";
-import { AnalysisReport } from "../../components/AnalysisReport";
-
-// Create some sample data to display for now
-const sampleAnalysis = {
-  wellbeingScore: 87,
-  topEmotions: ["Anxiety", "Frustration", "Optimism"],
-  keySymptoms: ["Hot Flashes", "Sleep Issues", "Brain Fog"],
-  userRecommendations: [
-    "Maintain regular follow-ups with healthcare provider.",
-    "Continue balanced approach to symptom management.",
-  ],
-  partnerRecommendations: [
-    "Maintain open dialogue about the menopause experience.",
-    "Regularly check in about relationship needs and changes.",
-  ],
-};
 
 export default function DashboardPage() {
   return (
@@ -33,13 +17,6 @@ export default function DashboardPage() {
       <div className="mt-8">
         <JournalForm />
       </div>
-
-      {/* We are adding the report below the form */}
-      {sampleAnalysis && (
-        <div className="mt-12">
-          <AnalysisReport {...sampleAnalysis} />
-        </div>
-      )}
     </div>
   );
 }

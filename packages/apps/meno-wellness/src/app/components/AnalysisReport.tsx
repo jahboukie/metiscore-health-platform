@@ -1,49 +1,48 @@
 'use client';
 
-// We can define the shape of the Tier 1 data we expect
+import { SentimentAnalysisResponse } from '@metiscore/types';
+
+// A helper function to determine the color for the crisis assessment card
+const getCrisisColor = (level?: string) => {
+  if (!level) return 'bg-gray-100 border-gray-500 text-gray-900';
+  const s = level.toLowerCase();
+  if (s.includes('high') || s.includes('critical')) return 'bg-red-100 border-red-500 text-red-900';
+  if (s.includes('medium') || s.includes('elevated')) return 'bg-yellow-100 border-yellow-500 text-yellow-900';
+  return 'bg-green-100 border-green-500 text-green-900';
+};
+
+// This defines the "props" our component accepts
 interface AnalysisReportProps {
-  wellbeingScore: number;
-  topEmotions: string[];
-  keySymptoms: string[];
-  userRecommendations: string[];
-  partnerRecommendations: string[];
+  response: SentimentAnalysisResponse;
 }
 
-export function AnalysisReport({
-  wellbeingScore,
-  topEmotions,
-  keySymptoms,
-  userRecommendations,
-  partnerRecommendations,
-}: AnalysisReportProps) {
+export function AnalysisReport({ response = {} }: AnalysisReportProps) {
+  // Use optional chaining (?.) to safely access nested properties
+  const { insights, sentiment, emotions, crisisAssessment } = response;
+
   return (
-    <div className="mt-8 rounded-lg bg-white shadow p-6">
-      <h2 className="text-xl font-semibold leading-6 text-gray-900">
-        Your Wellness Analysis
-      </h2>
+    <div className="bg-white rounded-lg shadow-md p-6">
+      <h3 className="text-xl font-bold text-slate-800 mb-4 border-b pb-2">AI Analysis Report</h3>
 
-      <div className="mt-6 border-t border-gray-200 pt-6">
-        {/* We will build out the UI for each of these sections next */}
-        <p><strong>Wellbeing Score:</strong> {wellbeingScore}%</p>
-        <p className="mt-4"><strong>Top Emotions:</strong> {topEmotions.join(', ')}</p>
-        <p className="mt-4"><strong>Key Symptoms:</strong> {keySymptoms.join(', ')}</p>
+      <div className="bg-slate-50 p-4 rounded-lg shadow-sm mb-4">
+        <h4 className="text-lg font-semibold text-blue-700 mb-2">Overall Assessment</h4>
+        <p className="text-slate-700">{insights?.overall_assessment || 'No assessment available.'}</p>
+      </div>
 
-        <div className="mt-6">
-          <h3 className="font-semibold text-gray-800">💡 For You:</h3>
-          <ul className="list-disc list-inside mt-2 text-gray-600">
-            {userRecommendations.map((rec, index) => (
-              <li key={index}>{rec}</li>
-            ))}
-          </ul>
+      <div className="grid md:grid-cols-2 gap-4">
+        <div className="bg-slate-50 p-4 rounded-lg shadow-sm">
+          <h4 className="font-semibold text-lg mb-2 text-slate-700">Sentiment</h4>
+          <p className="text-slate-600">Category: {sentiment?.category || 'N/A'}</p>
+          <p className="text-slate-600">Score: {sentiment?.score?.toFixed(2) || 'N/A'}</p>
         </div>
-
-        <div className="mt-6">
-          <h3 className="font-semibold text-gray-800">💕 For Your Partner:</h3>
-          <ul className="list-disc list-inside mt-2 text-gray-600">
-            {partnerRecommendations.map((rec, index) => (
-              <li key={index}>{rec}</li>
-            ))}
-          </ul>
+        <div className="bg-slate-50 p-4 rounded-lg shadow-sm">
+          <h4 className="font-semibold text-lg mb-2 text-slate-700">Emotions</h4>
+          <p className="text-slate-600">Primary: {emotions?.primary || 'N/A'}</p>
+          <p className="text-slate-600">Intensity: {emotions?.emotional_intensity?.toFixed(2) || 'N/A'}</p>
+        </div>
+        <div className={`p-4 rounded-lg shadow-sm border-l-4 ${getCrisisColor(crisisAssessment?.risk_level)} md:col-span-2`}>
+          <h4 className="font-semibold text-lg mb-2">Crisis Assessment</h4>
+          <p>Risk: {crisisAssessment?.risk_level || 'N/A'}</p>
         </div>
       </div>
     </div>

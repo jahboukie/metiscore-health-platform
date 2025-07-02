@@ -25,3 +25,23 @@ export interface Invite {
   createdAt: Date;
   expiresAt: Date;
 }
+
+// Add this new interface to the file
+
+export interface SentimentAnalysisResponse {
+  insights?: {
+    overall_assessment?: string;
+  };
+  sentiment?: {
+    category?: string;
+    score?: number;
+  };
+  emotions?: {
+    primary?: string;
+    emotional_intensity?: number;
+  };
+  crisisAssessment?: {
+    risk_level?: string;
+  };
+  // We can add any other fields from your API here
+}
