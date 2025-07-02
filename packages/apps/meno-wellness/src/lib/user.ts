@@ -1,15 +1,16 @@
-import { getFunctions, httpsCallable } from "firebase/functions";
 import { User as FirebaseAuthUser } from "firebase/auth";
 
-const functions = getFunctions();
-const onboardNewUserCallable = httpsCallable(functions, 'onboardnewuser');
-
 export async function onboardUser(user: FirebaseAuthUser) {
+  // The correct URL from your successful deployment
+  const functionUrl = "https://onboardnewuser-2vcq24dcma-uc.a.run.app"; 
+
   try {
-    console.log(`Calling onboardnewuser for ${user.uid}...`);
-    const result = await onboardNewUserCallable(user.toJSON());
-    console.log("Onboarding result:", result.data);
+    await fetch(functionUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: user.toJSON() }),
+    });
   } catch (error) {
-    console.error("This error is expected if the user document already exists:", error);
+    console.error("Error calling onboardUser function:", error);
   }
 }
