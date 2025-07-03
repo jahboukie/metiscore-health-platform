@@ -9,8 +9,8 @@ export async function onboardUser(user: FirebaseAuthUser) {
         await fetch(onboardFunctionUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            // Send the entire user object to the function
-            body: JSON.stringify(user.toJSON()),
+            // CORRECTED: Nest the user object in a 'data' property
+            body: JSON.stringify({ data: user.toJSON() }),
         });
     } catch (error) {
         console.error("Error calling onboardUser function:", error);
